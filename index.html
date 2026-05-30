@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="CUET Advisor" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>CUET College Advisor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface2: #f1f5f9;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-faint: #94a3b8;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --accent-fg: #ffffff;
+      --green: #10b981;
+      --orange: #f59e0b;
+      --red: #ef4444;
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+    .pink-theme {
+      --bg: #fff0f4;
+      --surface: #ffffff;
+      --surface2: #ffe4ec;
+      --border: #f9bfce;
+      --text: #4a0018;
+      --text-muted: #a03358;
+      --text-faint: #c47a8a;
+      --accent: #e8245a;
+      --accent2: #ff6b9d;
+      --accent-fg: #ffffff;
+      --green: #d63384;
+      --orange: #ff6b9d;
+      --red: #e8245a;
+    }
+
+    /* Name splash */
+    .name-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 28px;
+      background: var(--bg);
+      text-align: center;
+    }
+    .name-icon { font-size: 56px; margin-bottom: 24px; animation: floatBob 3s ease-in-out infinite; display: block; }
+    @keyframes floatBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+    .name-title { font-size: 26px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; margin-bottom: 8px; }
+    .name-sub { font-size: 14px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.6; }
+    .name-input {
+      width: 100%; max-width: 320px;
+      padding: 16px 18px;
+      border-radius: var(--radius);
+      border: 2px solid var(--border);
+      font-family: 'Inter', sans-serif;
+      font-size: 18px; font-weight: 700;
+      color: var(--text);
+      background: var(--surface);
+      outline: none; text-align: center;
+      transition: border-color 0.2s;
+      caret-color: var(--accent);
+      display: block; margin: 0 auto;
+    }
+    .name-input:focus { border-color: var(--accent); }
+    .name-input::placeholder { font-weight: 400; color: var(--text-faint); font-size: 15px; }
+    .name-btn {
+      display: block; width: 100%; max-width: 320px; margin: 14px auto 0;
+      padding: 16px;
+      border-radius: var(--radius); border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      font-family: 'Inter', sans-serif;
+      font-size: 16px; font-weight: 800; color: #fff;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .name-btn:active { opacity: 0.85; transform: scale(0.98); }
+    .name-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    /* Greeting chip in header */
+    .greeting-chip {
+      font-size: 11px; font-weight: 700;
+      color: var(--accent);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 3px 10px;
+      margin-bottom: 5px;
+      display: inline-block;
+    }
+    html, body { height: 100%; overscroll-behavior: none; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+    ::-webkit-scrollbar { display: none; }
+
+    .app { max-width: 430px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); position: relative; }
+
+    /* Header */
+    .header {
+      padding: 52px 18px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .header-label { font-size: 11px; color: var(--text-faint); font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 2px; }
+    .header-title { font-size: 22px; font-weight: 900; color: var(--text); letter-spacing: -0.5px; }
+    .step-pill {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 12px;
+      padding: 8px 14px;
+      text-align: center;
+      min-width: 56px;
+    }
+    .step-pill-num { font-size: 18px; font-weight: 900; color: #fff; line-height: 1; }
+    .step-pill-label { font-size: 10px; color: rgba(255,255,255,0.8); font-weight: 700; letter-spacing: 0.5px; }
+
+    /* Progress bar */
+    .progress-bar { height: 3px; background: var(--border); }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); transition: width 0.4s ease; }
+
+    /* Step label row */
+    .step-labels { display: flex; padding: 10px 18px 6px; gap: 0; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .step-lbl { flex: 1; text-align: center; font-size: 11px; font-weight: 600; color: var(--text-faint); transition: color 0.2s; }
+    .step-lbl.active { color: var(--accent); }
+    .step-lbl.done { color: var(--green); }
+
+    /* Content area */
+    .content { flex: 1; overflow-y: auto; padding: 16px 16px 100px; }
+
+    /* Section header */
+    .section-head { margin-bottom: 14px; }
+    .section-head h2 { font-size: 18px; font-weight: 800; color: var(--text); letter-spacing: -0.3px; }
+    .section-head p { font-size: 13px; color: var(--text-muted); margin-top: 3px; line-height: 1.5; }
+
+    /* Subject chips */
+    .subject-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .subj-btn {
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      line-height: 1.3;
+    }
+    .subj-btn:active { transform: scale(0.97); }
+    .subj-btn.sel {
+      border-color: var(--accent);
+      background: #eef2ff;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .subj-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      border: 2px solid currentColor;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .subj-btn.sel .subj-dot { background: var(--accent); border-color: var(--accent); }
+
+    /* Score sliders */
+    .score-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .score-item {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .score-item:last-child { border-bottom: none; }
+    .score-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .score-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .score-val-wrap { display: flex; align-items: baseline; gap: 2px; }
+    .score-num { font-size: 20px; font-weight: 900; color: var(--accent); }
+    .score-max { font-size: 11px; color: var(--text-faint); font-weight: 600; }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 3px solid #fff;
+      box-shadow: 0 0 0 1.5px var(--accent);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    input[type=range]::-webkit-slider-thumb:active { transform: scale(1.2); }
+    input[type=range]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); border: 3px solid #fff; cursor: pointer;
+    }
+    .score-bar-bg { height: 6px; background: var(--surface2); border-radius: 3px; margin-top: 6px; position: relative; overflow: hidden; }
+    .score-bar-fill { position: absolute; left: 0; top: 0; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 3px; transition: width 0.2s; }
+
+    /* Checkbox groups */
+    .pref-section { margin-bottom: 16px; }
+    .pref-title { font-size: 12px; font-weight: 800; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; padding: 0 2px; }
+    .cb-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .cb-btn {
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      font-size: 13px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .cb-btn:active { transform: scale(0.97); }
+    .cb-btn.sel { border-color: var(--accent); background: #eef2ff; color: var(--accent); font-weight: 700; }
+    .cb-box {
+      width: 18px; height: 18px; border-radius: 5px;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; transition: all 0.15s;
+    }
+    .cb-btn.sel .cb-box { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* Bottom CTA */
+    .bottom-cta {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      z-index: 100;
+    }
+    .btn-back {
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .btn-back:active { background: var(--surface2); }
+    .btn-next {
+      flex: 1;
+      padding: 14px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-next:active { opacity: 0.85; transform: scale(0.99); }
+    .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* Loading */
+    .loading-wrap {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 60px 20px; gap: 20px;
+    }
+    .spinner-ring {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-title { font-size: 16px; font-weight: 800; color: var(--text); }
+    .loading-sub { font-size: 13px; color: var(--text-muted); text-align: center; line-height: 1.6; }
+
+    /* Result cards */
+    .results-label { font-size: 12px; font-weight: 700; color: var(--text-faint); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 12px; }
+    .result-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 12px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+    .result-card:active { transform: scale(0.99); }
+    .result-card.best { border: 2px solid var(--accent); }
+    .card-inner { display: flex; }
+    .card-bar { width: 5px; flex-shrink: 0; }
+    .card-body { padding: 14px 14px 14px 12px; flex: 1; min-width: 0; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 6px; }
+    .college-name { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.3; }
+    .course-name { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .chance-badge {
+      border-radius: 8px;
+      padding: 3px 9px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .why-text { font-size: 12px; color: var(--text-muted); line-height: 1.55; margin: 8px 0; }
+    .meta-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+    .meta-chip {
+      font-size: 11px; font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--surface2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    /* Best match banner */
+    .best-banner {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      padding: 6px 14px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .best-banner span { font-size: 11px; font-weight: 800; color: #fff; letter-spacing: 0.3px; }
+
+    /* Disclaimer */
+    .disclaimer {
+      font-size: 12px;
+      color: var(--text-faint);
+      line-height: 1.7;
+      padding: 14px;
+      background: var(--surface);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%; transform: translateX(-50%);
+      background: var(--text);
+      color: #fff;
+      border-radius: 12px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 200;
+      white-space: nowrap;
+      animation: toastIn 0.25s ease;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Error */
+    .error-box {
+      background: #fef2f2; border: 1px solid #fecaca;
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      font-size: 13px; font-weight: 600; color: #dc2626;
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    /* Restart */
+    .restart-wrap { padding: 8px 0 4px; display: flex; justify-content: center; }
+    .restart-btn {
+      font-size: 13px; font-weight: 700;
+      color: var(--text-muted);
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 20px;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      display: flex; align-items: center; gap: 6px;
+      transition: all 0.15s;
+    }
+    .restart-btn:active { background: var(--surface2); }
+
+    /* Selection counter badge */
+    .sel-count {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 1px 7px;
+      margin-left: 4px;
+    }
+
+    /* Empty state */
+    .hint { font-size: 12px; color: var(--text-faint); text-align: center; padding: 8px 0 0; }
+  </style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>
+const SUBJECTS = [
+  "Mathematics","Physics","Chemistry","Biology",
+  "Accountancy","Business Studies","Economics","History",
+  "Political Science","Geography","Sociology","Psychology",
+  "Computer Science","English","Hindi","Legal Studies",
+  "Entrepreneurship","Fine Arts"
+];
+
+const PINK_NAMES = ['prachi', 'strawberry'];
+
+let state = {
+  screen: 'name',
+  name: '',
+  isPink: false,
+  step: 0,
+  subjects: [],
+  scores: {},
+  category: ["General"],
+  location: [],
+  budget: [],
+  facilities: [],
+  toast: null,
+  results: null,
+};
+
+let toastTimer = null;
+
+function showToast(msg) {
+  if (toastTimer) clearTimeout(toastTimer);
+  state.toast = msg;
+  render();
+  toastTimer = setTimeout(() => { state.toast = null; render(); }, 2200);
+}
+
+function setStep(n) {
+  state.step = n;
+  render();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function render() {
+  const app = document.getElementById('app');
+
+  // Apply/remove pink theme on root app div
+  if (state.isPink) app.classList.add('pink-theme');
+  else app.classList.remove('pink-theme');
+
+  // Name splash screen
+  if (state.screen === 'name') {
+    app.innerHTML = `
+      <div class="name-screen">
+        <span class="name-icon">🎓</span>
+        <div class="name-title">Welcome to CUET Advisor</div>
+        <div class="name-sub">Your personalised guide to finding<br>the best college &amp; course after CUET</div>
+        <input class="name-input" id="name-input" type="text" placeholder="What's your name?" maxlength="40" autocomplete="off" />
+        <button class="name-btn" id="name-btn" disabled>Let's go →</button>
+      </div>`;
+    bindEvents();
+    return;
+  }
+
+  const stepNames = ['Subjects', 'Scores', 'Preferences', 'Results'];
+  const pct = [0, 25, 60, 100][state.step];
+  const firstName = state.name.split(' ')[0];
+
+  const header = `
+    <div class="header">
+      <div>
+        <div class="greeting-chip">Hi, ${firstName} ${state.isPink ? '🌸' : '👋'}</div>
+        <div class="header-label">CUET College Advisor</div>
+        <div class="header-title">${stepNames[state.step]}</div>
+      </div>
+      <div class="step-pill">
+        <div class="step-pill-num">${state.step + 1}/4</div>
+        <div class="step-pill-label">STEP</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="step-labels">
+      ${stepNames.map((n,i) => `<div class="step-lbl ${i===state.step?'active':i<state.step?'done':''}">${i<state.step?'✓ ':''} ${n}</div>`).join('')}
+    </div>`;
+
+  let content = '';
+  if (state.step === 0) content = renderStep0();
+  else if (state.step === 1) content = renderStep1();
+  else if (state.step === 2) content = renderStep2();
+  else content = renderStep3();
+
+  const toast = state.toast ? `<div class="toast">${state.toast}</div>` : '';
+
+  app.innerHTML = `${header}<div class="content">${content}</div>${toast}`;
+  bindEvents();
+}
+
+function renderStep0() {
+  const count = state.subjects.length;
+  return `
+    <div class="section-head">
+      <h2>Which subjects did you appear for? ${count > 0 ? `<span class="sel-count">${count}</span>` : ''}</h2>
+      <p>Select all domain-specific subjects from your CUET exam</p>
+    </div>
+    <div class="subject-grid">
+      ${SUBJECTS.map(s => `
+        <button class="subj-btn${state.subjects.includes(s)?' sel':''}" data-subj="${s}">
+          <span class="subj-dot"></span>${s}
+        </button>`).join('')}
+    </div>
+    ${count === 0 ? '<p class="hint">Select at least one subject to continue</p>' : ''}
+    <div class="bottom-cta">
+      <button class="btn-next" id="s0-next" ${count===0?'disabled':''}>
+        Next — Set scores →
+      </button>
+    </div>`;
+}
+
+function renderStep1() {
+  const items = [...state.subjects, 'General Test'];
+  return `
+    <div class="section-head">
+      <h2>What are your expected scores?</h2>
+      <p>Drag the sliders to set your score for each subject</p>
+    </div>
+    <div class="score-card">
+      ${items.map((s, i) => {
+        const val = state.scores[s] !== undefined ? state.scores[s] : (s === 'General Test' ? 0 : 150);
+        const pct = Math.round((val / 250) * 100);
+        const isOptional = s === 'General Test';
+        return `
+        <div class="score-item">
+          <div class="score-top">
+            <div class="score-name">${s}${isOptional ? ' <span style="font-size:11px;font-weight:500;color:var(--text-faint)">(optional)</span>' : ''}</div>
+            <div class="score-val-wrap">
+              <span class="score-num" id="snum-${i}">${val}</span>
+              <span class="score-max">/250</span>
+            </div>
+          </div>
+          <input type="range" min="0" max="250" step="1" value="${val}" data-score="${s}" data-idx="${i}">
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="bottom-cta">
+      <button class="btn-back" id="s1-back">← Back</button>
+      <button class="btn-next" id="s1-next">Next — Preferences →</button>
+    </div>`;
+}
+
+function cbGrid(id, items, selected) {
+  return `<div class="cb-grid" id="${id}">
+    ${items.map(v => `
+      <label class="cb-btn${selected.includes(v)?' sel':''}">
+        <span class="cb-box">${selected.includes(v)?'✓':''}</span>
+        <span>${v}</span>
+        <input type="checkbox" value="${v}" ${selected.includes(v)?'checked':''} style="display:none">
+      </label>`).join('')}
+  </div>`;
+}
+
+function renderStep2() {
+  const cats = ["General","OBC-NCL","SC","ST","EWS","PwD"];
+  const locs = ["Delhi NCR","North India","South India","East India","West India","Central India","Metro cities only","Any location"];
+  const budgets = ["Under ₹20,000","₹20,000–₹60,000","₹60,000–₹1,50,000","Above ₹1,50,000"];
+  const facs = ["Hostel availability","Research infra","Sports facilities","Placement strength","International collab","Library & labs"];
+  return `
+    <div class="section-head">
+      <h2>Your preferences</h2>
+      <p>Select all that apply — helps us narrow down the best options</p>
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Category / reservation</div>
+      ${cbGrid('pref-cat', cats, state.category)}
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Preferred location</div>
+      ${cbGrid('pref-loc', locs, state.location)}
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Annual fee budget</div>
+      ${cbGrid('pref-budget', budgets, state.budget)}
+    </div>
+    <div class="pref-section">
+      <div class="pref-title">Campus priorities</div>
+      ${cbGrid('pref-fac', facs, state.facilities)}
+    </div>
+    <div class="bottom-cta">
+      <button class="btn-back" id="s2-back">← Back</button>
+      <button class="btn-next" id="s2-next">✦ Get recommendations</button>
+    </div>`;
+}
+
+function renderStep3() {
+  if (!state.results) {
+    return `<div class="loading-wrap">
+      <div class="spinner-ring"></div>
+      <div class="loading-title">Finding your matches...</div>
+      <div class="loading-sub">Analysing your scores and preferences<br>across universities in India</div>
+    </div>`;
+  }
+  if (state.results === 'error') {
+    return `
+      <div class="error-box">⚠ ${state.errorMsg || 'Something went wrong. Check your connection and retry.'}</div>
+      <div class="bottom-cta">
+        <button class="btn-back" id="s2-back">← Back</button>
+        <button class="btn-next" id="retry-btn">↺ Retry</button>
+      </div>`;
+  }
+
+  const colors = state.isPink ? ['#e8245a','#ff6b9d','#c2185b','#f48fb1','#ad1457','#ff4081'] : ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#0ea5e9'];
+  const chanceStyle = {
+    High: { bg: '#ecfdf5', color: '#059669' },
+    Moderate: { bg: '#eff6ff', color: '#3b82f6' },
+    Reach: { bg: '#fff7ed', color: '#ea580c' }
+  };
+
+  const cards = state.results.map((r, i) => {
+    const cs = chanceStyle[r.chance] || chanceStyle.Moderate;
+    const col = colors[i % colors.length];
+    return `
+      <div class="result-card${i===0?' best':''}">
+        ${i===0 ? `<div class="best-banner"><span>★ Best match for you</span></div>` : ''}
+        <div class="card-inner">
+          <div class="card-bar" style="background:${col}"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <div>
+                <div class="college-name">${r.college}</div>
+                <div class="course-name">${r.course}</div>
+              </div>
+              <span class="chance-badge" style="background:${cs.bg};color:${cs.color}">${r.chance}</span>
+            </div>
+            <div class="why-text">${r.why}</div>
+            <div class="meta-row">
+              <span class="meta-chip">📍 ${r.location}</span>
+              <span class="meta-chip">🏛 ${r.university_type}</span>
+              <span class="meta-chip">₹ ${r.annual_fee}/yr</span>
+              <span class="meta-chip">🎯 ~${r.cutoff_estimate}</span>
+              <span class="meta-chip">⭐ ${r.facilities_highlight}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="results-label">Your top 6 matches</div>
+    ${cards}
+    <div class="disclaimer">
+      <strong>Heads up:</strong> These are AI-estimated recommendations based on typical CUET cutoff patterns. Actual cutoffs vary by year, college, and category. Always verify at <a href="https://cuet.samarth.ac.in" target="_blank" rel="noopener" style="color:var(--accent);font-weight:700;">cuet.samarth.ac.in</a> before applying.
+    </div>
+    <div class="restart-wrap">
+      <button class="restart-btn" id="restart-btn">↺ Start over</button>
+    </div>`;
+}
+
+function bindEvents() {
+  // Name screen
+  const nameInput = document.getElementById('name-input');
+  const nameBtn = document.getElementById('name-btn');
+  if (nameInput) {
+    nameInput.addEventListener('input', () => {
+      const val = nameInput.value.trim();
+      nameBtn.disabled = val.length === 0;
+    });
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && nameInput.value.trim().length > 0) submitName(nameInput.value.trim());
+    });
+    nameInput.focus();
+  }
+  if (nameBtn) {
+    nameBtn.addEventListener('click', () => {
+      const val = document.getElementById('name-input').value.trim();
+      if (val) submitName(val);
+    });
+  }
+
+  // Step 0 — subject toggles
+  document.querySelectorAll('.subj-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const s = btn.dataset.subj;
+      if (state.subjects.includes(s)) state.subjects = state.subjects.filter(x=>x!==s);
+      else { state.subjects.push(s); showToast(`${s} added`); }
+      render();
+    });
+  });
+  const s0n = document.getElementById('s0-next');
+  if (s0n) s0n.addEventListener('click', () => setStep(1));
+
+  // Step 1 — sliders
+  document.querySelectorAll('input[data-score]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const v = parseInt(inp.value);
+      state.scores[inp.dataset.score] = v;
+      const el = document.getElementById('snum-' + inp.dataset.idx);
+      if (el) el.textContent = v;
+    });
+  });
+  const s1b = document.getElementById('s1-back');
+  if (s1b) s1b.addEventListener('click', () => setStep(0));
+  const s1n = document.getElementById('s1-next');
+  if (s1n) s1n.addEventListener('click', () => {
+    state.subjects.forEach(s => { if (state.scores[s] === undefined) state.scores[s] = 150; });
+    if (state.scores['General Test'] === undefined) state.scores['General Test'] = 0;
+    setStep(2);
+  });
+
+  // Step 2 — checkboxes
+  document.querySelectorAll('.cb-btn').forEach(lbl => {
+    lbl.addEventListener('click', () => {
+      const inp = lbl.querySelector('input');
+      inp.checked = !inp.checked;
+      const gid = lbl.closest('.cb-grid').id;
+      lbl.classList.toggle('sel', inp.checked);
+      lbl.querySelector('.cb-box').textContent = inp.checked ? '✓' : '';
+      const vals = Array.from(document.querySelectorAll(`#${gid} input:checked`)).map(i=>i.value);
+      if (gid==='pref-cat') state.category = vals;
+      else if (gid==='pref-loc') state.location = vals;
+      else if (gid==='pref-budget') state.budget = vals;
+      else if (gid==='pref-fac') state.facilities = vals;
+    });
+  });
+  const s2b = document.getElementById('s2-back');
+  if (s2b) s2b.addEventListener('click', () => setStep(1));
+  const s2n = document.getElementById('s2-next');
+  if (s2n) s2n.addEventListener('click', () => { state.results = null; setStep(3); fetchRecommendations(); });
+
+  // Step 3
+  const retryBtn = document.getElementById('retry-btn');
+  if (retryBtn) retryBtn.addEventListener('click', () => { state.results = null; render(); fetchRecommendations(); });
+  const s3b = document.getElementById('s2-back');
+  if (s3b && state.step === 3) s3b.addEventListener('click', () => setStep(2));
+  const restartBtn = document.getElementById('restart-btn');
+  if (restartBtn) restartBtn.addEventListener('click', resetApp);
+}
+
+function submitName(name) {
+  state.name = name;
+  state.isPink = PINK_NAMES.includes(name.toLowerCase().trim());
+  state.screen = 'app';
+  if (state.isPink) showToast('🌸 Welcome, ' + name + '!');
+  else showToast('Welcome, ' + name + '! 🎓');
+  render();
+}
+
+function resetApp() {
+  state.step = 0; state.subjects = []; state.scores = {};
+  state.category = ['General']; state.location = []; state.budget = []; state.facilities = [];
+  state.results = null; state.screen = 'name'; state.name = ''; state.isPink = false;
+  render();
+}
+
+async function fetchRecommendations() {
+  const scoreList = state.subjects.map(s => `${s}: ${state.scores[s]??150}/250`).join(', ');
+  const genTest = state.scores['General Test'] ? `General Test: ${state.scores['General Test']}/250` : '';
+  const prompt = `You are a CUET college counselor for India. Student profile:
+
+CUET Scores: ${scoreList}${genTest ? '\n'+genTest : ''}
+Category: ${state.category.length ? state.category.join(', ') : 'General'}
+Location preference: ${state.location.length ? state.location.join(', ') : 'Any in India'}
+Fee budget: ${state.budget.length ? state.budget.join(' or ') : 'Any'}
+Campus priorities: ${state.facilities.length ? state.facilities.join(', ') : 'None specified'}
+
+Recommend exactly 6 college-course combinations across Central, State, and Deemed Universities. Include DU North/South Campus colleges where relevant. Consider CUET cutoffs, rankings, course fit, fees, and location.
+
+Respond ONLY with a valid JSON array, no markdown, no extra text:
+[{"rank":1,"college":"Full name","university_type":"Central/State/Deemed","course":"Full course name","location":"City, State","annual_fee":"e.g. ₹25,000","cutoff_estimate":"e.g. 180-210","chance":"High/Moderate/Reach","why":"One sentence fit reason","facilities_highlight":"One campus feature"}]`;
+
+  try {
+    const GROQ_KEY = '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';
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_KEY}`
+      },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 1500,
+        temperature: 0.7
+      })
+    });
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('API ' + res.status + ': ' + errText.slice(0, 200));
+    }
+    const data = await res.json();
+    const raw = (data.choices?.[0]?.message?.content || '').replace(/```json|```/g,'').trim();
+    state.results = JSON.parse(raw);
+    showToast('6 matches found ✓');
+    render();
+  } catch(e) {
+    console.error('Fetch error:', e);
+    state.results = 'error';
+    state.errorMsg = e.message;
+    render();
+  }
+}
+
+render();
+</script>
+</body>
+</html>
