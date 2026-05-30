@@ -438,42 +438,7 @@
 
     /* Empty state */
     .hint { font-size: 12px; color: var(--text-faint); text-align: center; padding: 8px 0 0; }
-  
-.pink-theme::before,
-.pink-theme::after{
-  content:"🌸";
-  position:fixed;
-  font-size:42px;
-  opacity:.22;
-  z-index:0;
-  pointer-events:none;
-}
-.pink-theme::before{top:18px;left:18px;}
-.pink-theme::after{bottom:18px;right:18px;}
-
-.pink-theme .app{
-  position:relative;
-  overflow:hidden;
-}
-.pink-theme .app::before,
-.pink-theme .app::after{
-  content:"🌸 🌷 🌸";
-  position:absolute;
-  font-size:26px;
-  opacity:.14;
-  pointer-events:none;
-}
-.pink-theme .app::before{top:90px;right:8px;}
-.pink-theme .app::after{bottom:120px;left:8px;}
-
-.pink-theme .greeting-chip::before{
-  content:"🌸 ";
-}
-.pink-theme .greeting-chip::after{
-  content:" 🌸";
-}
-
-</style>
+  </style>
 </head>
 <body>
 <div class="app" id="app"></div>
@@ -487,8 +452,12 @@ const SUBJECTS = [
   "Entrepreneurship","Fine Arts"
 ];
 
+const PINK_NAMES = ['prachi', 'strawberry'];
+
 let state = {
-  username: '',
+  screen: 'name',
+  name: '',
+  isPink: false,
   step: 0,
   subjects: [],
   scores: {},
@@ -517,35 +486,34 @@ function setStep(n) {
 
 function render() {
   const app = document.getElementById('app');
-  if (!state.username) {
+
+  // Apply/remove pink theme on root app div
+  if (state.isPink) app.classList.add('pink-theme');
+  else app.classList.remove('pink-theme');
+
+  // Name splash screen
+  if (state.screen === 'name') {
     app.innerHTML = `
       <div class="name-screen">
         <span class="name-icon">🎓</span>
-        <div class="name-title">CUET College Advisor</div>
-        <div class="name-sub">Enter your name to begin</div>
-        <input class="name-input" id="name-input" placeholder="Your name">
-        <button class="name-btn" id="name-btn">Continue</button>
+        <div class="name-title">Welcome to CUET Advisor</div>
+        <div class="name-sub">Your personalised guide to finding<br>the best college &amp; course after CUET</div>
+        <input class="name-input" id="name-input" type="text" placeholder="What's your name?" maxlength="40" autocomplete="off" />
+        <button class="name-btn" id="name-btn" disabled>Let's go →</button>
       </div>`;
-    const btn = document.getElementById('name-btn');
-    const inp = document.getElementById('name-input');
-    btn.onclick = () => {
-      const name = inp.value.trim();
-      if (!name) return;
-      state.username = name;
-      const n = name.toLowerCase();
-      if (n === 'prachi' || n === 'strawberry') document.body.classList.add('pink-theme');
-      render();
-    };
-    inp.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+    bindEvents();
     return;
   }
+
   const stepNames = ['Subjects', 'Scores', 'Preferences', 'Results'];
   const pct = [0, 25, 60, 100][state.step];
+  const firstName = state.name.split(' ')[0];
 
   const header = `
     <div class="header">
       <div>
-        <div class="greeting-chip" id="change-name-btn" style="cursor:pointer">Hi, ${state.username} ✏️</div><div class="header-label">CUET College Advisor</div>
+        <div class="greeting-chip">Hi, ${firstName} ${state.isPink ? '🌸' : '👋'}</div>
+        <div class="header-label">CUET College Advisor</div>
         <div class="header-title">${stepNames[state.step]}</div>
       </div>
       <div class="step-pill">
@@ -682,7 +650,7 @@ function renderStep3() {
       </div>`;
   }
 
-  const colors = ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#0ea5e9'];
+  const colors = state.isPink ? ['#e8245a','#ff6b9d','#c2185b','#f48fb1','#ad1457','#ff4081'] : ['#6366f1','#10b981','#f59e0b','#ef4444','#8b5cf6','#0ea5e9'];
   const chanceStyle = {
     High: { bg: '#ecfdf5', color: '#059669' },
     Moderate: { bg: '#eff6ff', color: '#3b82f6' },
@@ -730,6 +698,26 @@ function renderStep3() {
 }
 
 function bindEvents() {
+  // Name screen
+  const nameInput = document.getElementById('name-input');
+  const nameBtn = document.getElementById('name-btn');
+  if (nameInput) {
+    nameInput.addEventListener('input', () => {
+      const val = nameInput.value.trim();
+      nameBtn.disabled = val.length === 0;
+    });
+    nameInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && nameInput.value.trim().length > 0) submitName(nameInput.value.trim());
+    });
+    nameInput.focus();
+  }
+  if (nameBtn) {
+    nameBtn.addEventListener('click', () => {
+      const val = document.getElementById('name-input').value.trim();
+      if (val) submitName(val);
+    });
+  }
+
   // Step 0 — subject toggles
   document.querySelectorAll('.subj-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -787,58 +775,58 @@ function bindEvents() {
   if (s3b && state.step === 3) s3b.addEventListener('click', () => setStep(2));
   const restartBtn = document.getElementById('restart-btn');
   if (restartBtn) restartBtn.addEventListener('click', resetApp);
+}
 
-  const changeNameBtn = document.getElementById('change-name-btn');
-  if (changeNameBtn) changeNameBtn.addEventListener('click', () => {
-    state.username = '';
-    document.body.classList.remove('pink-theme');
-    render();
-  });
+function submitName(name) {
+  state.name = name;
+  state.isPink = PINK_NAMES.includes(name.toLowerCase().trim());
+  state.screen = 'app';
+  if (state.isPink) showToast('🌸 Welcome, ' + name + '!');
+  else showToast('Welcome, ' + name + '! 🎓');
+  render();
 }
 
 function resetApp() {
   state.step = 0; state.subjects = []; state.scores = {};
   state.category = ['General']; state.location = []; state.budget = []; state.facilities = [];
-  state.results = null;
-  setStep(0);
-}
-
-
-async function fetchRecommendations() {
-  const totalScore = Object.entries(state.scores)
-    .filter(([k]) => k !== 'General Test')
-    .reduce((a,[,v]) => a + Number(v || 0), 0);
-
-  const colleges = [
-    {college:"SRCC",course:"B.Com (Hons)",location:"Delhi",university_type:"Central",annual_fee:"₹30,000",cutoff:760,facilities_highlight:"Top commerce placements"},
-    {college:"Hindu College",course:"B.A. (Hons) Economics",location:"Delhi",university_type:"Central",annual_fee:"₹25,000",cutoff:730,facilities_highlight:"Strong academics"},
-    {college:"Hansraj College",course:"B.Sc. (Hons)",location:"Delhi",university_type:"Central",annual_fee:"₹28,000",cutoff:700,facilities_highlight:"Research facilities"},
-    {college:"Ramjas College",course:"B.A. Programme",location:"Delhi",university_type:"Central",annual_fee:"₹20,000",cutoff:650,facilities_highlight:"Active campus life"},
-    {college:"BHU",course:"B.Sc. Mathematics",location:"Varanasi",university_type:"Central",annual_fee:"₹15,000",cutoff:620,facilities_highlight:"Historic campus"},
-    {college:"University of Hyderabad",course:"Integrated Sciences",location:"Hyderabad",university_type:"Central",annual_fee:"₹35,000",cutoff:680,facilities_highlight:"Research culture"},
-    {college:"Jamia Millia Islamia",course:"B.A. (Hons)",location:"Delhi",university_type:"Central",annual_fee:"₹18,000",cutoff:600,facilities_highlight:"Affordable education"},
-    {college:"Christ University",course:"BBA",location:"Bengaluru",university_type:"Deemed",annual_fee:"₹150,000",cutoff:550,facilities_highlight:"Industry exposure"},
-    {college:"Symbiosis",course:"BBA",location:"Pune",university_type:"Deemed",annual_fee:"₹220,000",cutoff:580,facilities_highlight:"Corporate network"},
-    {college:"Jadavpur University",course:"B.Sc.",location:"Kolkata",university_type:"State",annual_fee:"₹12,000",cutoff:640,facilities_highlight:"Excellent value"}
-  ];
-
-  const ranked = colleges.map(c => {
-    const diff = totalScore - c.cutoff;
-    let chance = diff >= 40 ? "High" : diff >= -40 ? "Moderate" : "Reach";
-    return {
-      ...c,
-      cutoff_estimate: c.cutoff,
-      chance,
-      why: `Based on your estimated CUET performance and preferences, this is a suitable option.`,
-      score: diff
-    };
-  }).sort((a,b)=>b.score-a.score).slice(0,6);
-
-  state.results = ranked;
-  showToast('6 matches found ✓');
+  state.results = null; state.screen = 'name'; state.name = ''; state.isPink = false;
   render();
 }
 
+async function fetchRecommendations() {
+  const scoreList = state.subjects.map(s => `${s}: ${state.scores[s]??150}/250`).join(', ');
+  const genTest = state.scores['General Test'] ? `General Test: ${state.scores['General Test']}/250` : '';
+  const prompt = `You are a CUET college counselor for India. Student profile:
+
+CUET Scores: ${scoreList}${genTest ? '\n'+genTest : ''}
+Category: ${state.category.length ? state.category.join(', ') : 'General'}
+Location preference: ${state.location.length ? state.location.join(', ') : 'Any in India'}
+Fee budget: ${state.budget.length ? state.budget.join(' or ') : 'Any'}
+Campus priorities: ${state.facilities.length ? state.facilities.join(', ') : 'None specified'}
+
+Recommend exactly 6 college-course combinations across Central, State, and Deemed Universities. Include DU North/South Campus colleges where relevant. Consider CUET cutoffs, rankings, course fit, fees, and location.
+
+Respond ONLY with a valid JSON array, no markdown, no extra text:
+[{"rank":1,"college":"Full name","university_type":"Central/State/Deemed","course":"Full course name","location":"City, State","annual_fee":"e.g. ₹25,000","cutoff_estimate":"e.g. 180-210","chance":"High/Moderate/Reach","why":"One sentence fit reason","facilities_highlight":"One campus feature"}]`;
+
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt })
+    });
+    if (!res.ok) throw new Error('API ' + res.status);
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+    const raw = (data.content||'').replace(/```json|```/g,'').trim();
+    state.results = JSON.parse(raw);
+    showToast('6 matches found ✓');
+    render();
+  } catch(e) {
+    state.results = 'error';
+    render();
+  }
+}
 
 render();
 </script>
